@@ -11,9 +11,9 @@ html:
 	cat parts/head.part parts/install1.part ../trunc/INSTALL parts/pre2.part parts/tail.part > install.html
 
 upload: install
-	rsync -avz *.html shell.berlios.de:/home/groups/nntpspider/htdocs
+	rsync -avz *.html css shell.berlios.de:/home/groups/nntpspider/htdocs
 
-install:
+install: html
 
 clean:
 	rm -f *.html *~ css/*~ content/*~ parts/*~
