@@ -1,7 +1,10 @@
 # $Id$
+# $Log$
 
 HTML=index.html manpage.html
 PRE=README.html TODO.html INSTALL.html
+
+CSSFILES=css/nntpspider.css css/bg1.gif css/spinne.jpg
 
 html: $(HTML) $(PRE)
 
@@ -20,14 +23,16 @@ $(PRE): %.html : ../trunc/% parts/head.part parts/pre1.sh parts/pre2.part parts/
 
 
 upload: install
-	rsync -avz *.html css pics/favicon.ico shell.berlios.de:/home/groups/nntpspider/htdocs
+#	rsync -avz *.html css pics/favicon.ico shell.berlios.de:/home/groups/nntpspider/htdocs
+	cd ~/public_html/nntpspider; \
+	rsync -avz *.html css favicon.ico shell.berlios.de:/home/groups/nntpspider/htdocs
 
 
 
 install: html
 	install $(HTML) $(PRE) pics/favicon.ico ~/public_html/nntpspider
 	install -d ~/public_html/nntpspider/css
-	install css/* ~/public_html/nntpspider/css
+	install $(CSSFILES) ~/public_html/nntpspider/css
 
 
 
