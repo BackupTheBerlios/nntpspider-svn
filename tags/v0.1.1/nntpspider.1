@@ -1,0 +1,197 @@
+.\" Man page for NNTPspider
+.\"
+.\" Copyright (C) 2004 Michael Mayer (MM)
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file COPYING that comes with the
+.\" man-db distribution.
+.\"
+.\" $Id$  MM (mmayer@users.berlios.de)
+.\" 
+.pc
+.TH NNTPspider 1 "2004-03-13" "0.1.1" "Network utilities"
+.SH NAME
+.B NNTPspider \- Automated search for public accessable nntp servers
+.SH SYNOPSIS
+.B nntpspider
+.RB [\| \-hDvV \|]
+.RB [\| \-a
+.RI n
+.RB ]
+.RB [\| \-A
+.RI n
+.RB ]
+.RB [\| \-t
+.RI sec
+.RB ]
+.RB [\| \-g
+.RI groupfile
+.RB ]
+.RB [\| \-i
+.RI serverlist
+.RB ]
+.RB [\| \-o
+.RI outfile
+.RB ]
+.SH DESCRIPTION
+.B nntpspider
+searches for public accessable NNTP servers. It reads a list of known servers
+from
+.I serverlist
+or, if no list specified, from standard input. All listed
+servers are checked for public access and queried for a list of supplied
+newsgroups. A number of articles from the groups listed in
+.I groupfile
+are fetched and analysed to gain information about additional nntp servers which
+in turn are queried. The
+resulting list of currently availiable newsservers is saved to
+.I outfile
+(or stdout if no file is specified). For every public host the list of 
+supplied newsgroups is saved to a file
+.I <hostname>.grouplist
+.SH OPTIONS
+.B IMPORTANT NOTE:
+long options are not yet implemented! Use the short variants only.
+.TP
+.B \-a, \-\-articles
+number of articles to check per group, can be overridden in
+.I groupfile 
+on a per-group basis, 0=all availiable (beware! For some servers 
+this can be a very large number > 20000)
+.TP
+.B \-A, \-\-hardmax
+hard maximum number of articles to check per group (default=0, no hard
+maximum). This number can't be overridden in
+.I groupfile.
+.TP
+.B \-o, \-\-outfile
+save list of found servers to this file (default: stdout).
+.TP
+.B \-i, \-\-infile
+read list of known servers from this file (default: stdin).
+.TP
+.B \-g, \-\-groups
+use groups in this file for spidering.
+.TP
+.B \-t, \-\-timeout
+timeout for connection to a server.
+.TP
+.B \-v, \-\-verbose
+be verbose.
+.TP
+.B \-D, \-\-debug
+debug mode: be very verbose.
+.TP
+.B \-V, \-\-version
+Display version information.
+.TP
+.B \-h, \-\-help
+show this usage message.
+.SH USAGE
+Format der Eingabe beschreiben.
+.SH EXAMPLES
+.B nntpspider
+-i serverlist -o foundservers -D
+.PP
+This will start a search with the servers listed in
+.I serverlist
+and a small default set of some widespread and high-traffic newsgroups. The
+list of found servers is written to
+.I foundservers.
+.PP
+.B nntpspider
+-i serverlist -o foundservers -g grouplist -A 100 -D
+.PP
+This search will use the set of newsgroups listed in
+.I grouplist.
+A maximum number of 100 articles per group is fetched.
+.SH ENVIRONMENT
+If no default server is given, NNTPSERVER is used.
+.SH FILES
+.TP 5
+.I outfile
+comprehensive information about all checked hosts. One line per host, the 
+fields are delimited by ':'. The field are (in this order):
+.TP 2
+.B hostname,
+.TP 2
+.B port,
+.TP 2
+.B username,
+.TP 2
+.B password,
+.TP 2
+.B status
+('-': unreachable, 'c': closed host, needs a unknown password, 'p': private
+host, need a known password (supplied in the username/password fields), 'o':
+open host, no authentification is needed.
+.TP 2
+.B firstseen
+Unix timestamp when this host was checked for the very first time.
+.TP 2
+.B lastseen
+Unix timestamp for the last time this host was checked (successful or not).
+.TP 2
+.B groupcnt
+Number of supplied groups on this host.
+.TP 2
+.B artcnt
+Total number of supplied articles in all availiable groups.
+.TP 2
+.B speed
+Not used.
+.TP 2
+.B servermessage
+The welcome (or not...) message the server gave us at login.
+.TP 5
+.I <hostname>.grouplist
+list of supplied newsgroups for every host with status open ('o') or public
+('p').
+.TP 5
+.I serverlist
+same format like
+.I outfile,
+but all fields after the hostname are optional. In the simplest case, it is
+only a list of some hostnames, one name per line. Empty lines are allowed,
+lines starting with '#' are treated as comments and ignored.
+It is a good idea to use the 
+.I outfile 
+from the previos invocation of
+.B nntpspider
+in order to avoid unnecessary queries for hosts which are known to be closed
+or unavailable. This speeds up the whole process a lot.
+.TP 5
+.I grouplist
+list of groups to use for spidering. One line per group, optionally
+including the maximum number of articles to download from this group,
+delimited from the groupname with a ':', like
+.B comp.os.linux:50
+.SH "HOW DOES IT WORK IN DETAIL?"
+All servers with public or unknown status are queried for a list of supplied
+newsgroups. If access is granted, the Path: lines from the message headers
+of Usenet postings in a couple of groups are scanned for information about
+the nntp servers used posting these ones. All found servers are queried
+until no more unknown servers are found.
+.PP
+The search starts with at least one default
+newsserver you have access to, usually the one at your ISP. The list of
+known server is read from the given files or read from stdin.
+.SH BUGS
+Many. It is still an alpha version, expect the worse. See the TODO file for
+a list of missing and planned features.
+.PP
+Existing files will be overwritten without a warning.
+.PP
+Please report all bugs to the bug tracker on the project web
+site. Just go to http://nntpspider.berlios.de, and click
+"Bug Reports" on the sidebar.
+.SH ACKNOWLEDGMENTS
+Writing this tool was inspired by the windows based NewsWolf
+(http://www.netwu.com/newswolf)
+.SH AVAILABILITY
+The latest version of this program can be found at:
+http://nntpspider.berlios.de
+.SH AUTHOR
+.nf
+Michael Mayer (mmayer@users.berlios.de).
+.fi
