@@ -72,6 +72,7 @@ a:active, a:hover {
 	}
 
 #pageHeader h1 {
+	color: #003D67;
 	font-size: 48px;
 	position: absolute;
 	top: 60px;
@@ -80,6 +81,7 @@ a:active, a:hover {
 	}
 
 #pageHeader h2 {
+	color: #003D67;
 	font-size: 20px;
 	position: absolute;
 	top: 120px;
@@ -114,6 +116,11 @@ a:active, a:hover {
 	height: 132px;
 	overflow: auto;
 	}
+
+.date {
+	font-style: italic;
+	font-weight: bold;
+}
 
 #quickSummary .p2 {
 	font: 0.8em "trebuchet ms", tahoma, verdana, sans-serif;

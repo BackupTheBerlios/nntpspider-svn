@@ -2,7 +2,7 @@
 # $Log$
 
 HTML=index.html manpage.html
-PRE=README.html TODO.html INSTALL.html
+PRE=README.html TODO.html INSTALL.html ChangeLog.html
 
 CSSFILES=css/nntpspider.css css/bg1.gif css/spinne.jpg
 
@@ -15,11 +15,19 @@ $(HTML): % : parts/head.part content/% parts/tail.part
 
 
 # assemble pages from preformated ASCII test:
-$(PRE): %.html : ../trunc/% parts/head.part parts/pre1.sh parts/pre2.part parts/tail.part
+$(PRE): %.html : content/% parts/head.part parts/pre1.sh parts/pre2.part parts/tail.part
 	cp parts/head.part $@
 	. ./parts/pre1.sh $(basename $@) >> $@
 	cat $< parts/pre2.part parts/tail.part >> $@
 
+
+
+# copy the TODO, README and INSTALL file from the source dir to the content
+# dir in order to preserve these files in the last released state, independent
+# from unreleased changes.
+init:
+#	cp -a ../trunc/TODO ../trunc/README ../trunc/INSTALL content
+	cp -a $(patsubst %.html, ../trunc/%, $(PRE)) content
 
 
 upload: install
