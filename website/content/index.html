@@ -1,0 +1,114 @@
+<div id="dfpreamble">	<!-- ruebergeholt aus div intro -->
+	<h3><span>Overview</span></h3>
+	<p class="p1"><span>
+
+
+		<span class="nntpspider">nntpspider</span> searches for
+		public accessable NNTP servers. It reads a list of known
+		servers from <I>file</I> arguments, or if none are
+		specified, its standard input. All the found servers are
+		checked for public access, queried for a list of supplied
+		newsgroups and for information about additional nntp
+		servers. The resulting list of currently availiable
+		newsservers is saved to a file <I>serverscan.result</I> in
+		the current directory. For every public host the list of
+		supplied newsgroups is saved to a file
+		<I>&lt;hostname&gt;.grouplist</I>
+
+	</span></p>
+	<h3><span>How does it work?</span></h3>
+	<p class="p3"><span>
+
+		All servers with public or unknown status are queried for a
+		list of supplied newsgroups. If access is granted, the Path:
+		lines from the message headers of Usenet postings in a
+		couple of groups are scanned for information about the nntp
+		servers used posting these ones. All found servers are
+		queried until no more unknown servers are found.
+
+	</span></p>
+	<p class="p3"><span>
+
+		The search starts with at least one default newsserver you
+		have access to, usually the one at your ISP. The list of
+		known server is read from the given files or read from
+		stdin.
+
+	</span></p>
+	<h3><span>Prerequisitories</span></h3>
+	<p class="p1"><span>
+
+		<ul>
+			<li>Perl (tested with Perl 5.8.3 but should work with every version)</li>
+			<li>Net::NNTP module (avaliable at <a href="http://www.cpan.org">CPAN</a>)</li>
+		</ul>
+
+
+	</span></p>
+	<h3><span>Bugs</span></h3>
+	<p class="p1"><span>
+
+		Many. It is an early alpha version, far from being bullet
+		proof. Expect the worse.
+
+	</span></p>
+	<p class="p1"><span>
+
+		Results are saved in file serverscan.result. Much too
+		verbose. Sometimes very slow when accessing individual
+		articles (looking dead, but still working). Queries the
+		standard port 119 only, so &quot;hidden&quot; servers using
+		non-standard portnumbers can't be detected. Filename not
+		configurable.  Existing files will be overwritten without a
+		warning.
+
+	</span></p>
+	<p class="p1"><span>
+
+		Please report all bugs to the 
+		<a href="http://developer.berlios.de/bugs/?group_id=1550">
+		bug tracker</a> on the project web site.
+
+	</span></p>
+	<h3><span>Anonymous SVN (Subversion) Access</span></h3>
+	<p class="p1"><span>
+
+		This project's BerliOS Developer SVN repository can be
+		checked out through anonymous (svnserve) SVN. The following
+		instruction will checkout all source files to a new
+		directory <code>nntpspider</code>:
+
+	</span></p>
+	<p class="code"><span>
+
+		<code>svn checkout svn://svn.berlios.de/nntpspider/trunc nntpspider</code>
+
+	</span></p>
+	<h3><span>More information</span></h3>
+	<p class="p1"><span>
+
+		can be found in the
+		<a href="manpage.html">man page</a>, the
+		<a href="readme.html">README</a> and the
+		<a href="todo.html">TODO</a>.
+
+	</span></p>
+	<h3><span>Acknowledgments</span></h3>
+	<p class="p1"><span>
+
+		Writing this tool was inspired by the windows based
+		<a href="http://www.netwu.com/newswolf">NewsWolf</a>
+
+	</span></p>
+	<h3><span>Author</span></h3>
+	<p class="p1"><span>
+
+		Michael Mayer: mmayer (at) users (dot) berlios (dot) de
+
+	</span></p>
+</div>
+
+<div id="footer">
+	<span class="author">© 2004 by M. Mayer</span>
+	<span class="id">$Id$</span>
+</div>
