@@ -114,11 +114,11 @@ usage: nntpspider [-hDvV] [-a n] [-A n] [-t sec] [-g groupfile]
 >>> NOTE: long options not yet implemented.
 >>>       options marked with # are accepted, but not yet implemented.
 
--A, --hardmax	hard maximum number of articles to check per group
-		(default=0, no hard maximum)
 -a, --articles	number of articles to check per group, can be overridden in
 		groupfile on a per-group basis
 		(0=all availiable, default=$maxarticles)
+-A, --hardmax	hard maximum number of articles to check per group
+		(default=0, no hard maximum)
 -o, --outfile	save list of found servers to this file (default: stdout)
 -i, --infile	read list of known servers from this file (default: stdin)
 -g, --groups	use groups in groupfile for spidering (default:
@@ -126,7 +126,7 @@ usage: nntpspider [-hDvV] [-a n] [-A n] [-t sec] [-g groupfile]
 -t, --timeout	timeout for connection to a server (default: $nntptimeout seconds)
 -v, --verbose	be verbose
 -D, --debug	debug mode: be _very_ verbose. Only for development.
--V, --version	show version.
+-V, --version	Display version information.
 -h, --help	show this usage message.
 EOF
 }

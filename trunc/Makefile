@@ -2,8 +2,8 @@ VERSION=0.1
 NAME=nntpspider-$(VERSION)
 
 FILES=AUTHORS COPYING INSTALL TODO README Makefile ChangeLog \
-	nntpspider nntpspider.1 \
-	debian
+	nntpspider nntpspider.1
+DEBFILES=debian/copyright
 
 
 .PHONY: clean dist install
@@ -15,8 +15,9 @@ install:
 	install -p nntpspider.1 /usr/local/man/man1
 
 dist: clean
-	mkdir -p $(NAME)
+	mkdir -p $(NAME)/debian
 	cp -a $(FILES) $(NAME)
+	cp -a $(DEBFILES) $(NAME)/debian
 	tar cvzf $(NAME).tar.gz $(NAME)
 	rm -rf $(NAME)
 
