@@ -1,22 +1,40 @@
 # $Id$
 
 HTML=index.html manpage.html
+PRE=README.html TODO.html INSTALL.html
 
-html:
-	for i in $(HTML); do \
-		cat parts/head.part content/$$i parts/tail.part > $$i; \
-	done
-	cat parts/head.part parts/readme1.part ../trunc/README parts/pre2.part parts/tail.part > readme.html
-	cat parts/head.part parts/todo1.part ../trunc/TODO parts/pre2.part parts/tail.part > todo.html
-	cat parts/head.part parts/install1.part ../trunc/INSTALL parts/pre2.part parts/tail.part > install.html
+html: $(HTML) $(PRE)
+
+# assemble pages from partial html files:
+$(HTML): % : parts/head.part content/% parts/tail.part
+	cat $^ > $@
+
+
+
+# assemble pages from preformated ASCII test:
+$(PRE): %.html : ../trunc/% parts/head.part parts/pre1.sh parts/pre2.part parts/tail.part
+	cp parts/head.part $@
+	. ./parts/pre1.sh $(basename $@) >> $@
+	cat $< parts/pre2.part parts/tail.part >> $@
+
+
 
 upload: install
-	rsync -avz *.html css shell.berlios.de:/home/groups/nntpspider/htdocs
+	rsync -avz *.html css pics/favicon.ico shell.berlios.de:/home/groups/nntpspider/htdocs
+
+
 
 install: html
+	install $(HTML) $(PRE) pics/favicon.ico ~/public_html/nntpspider
+	install -d ~/public_html/nntpspider/css
+	install css/* ~/public_html/nntpspider/css
+
+
 
 clean:
 	rm -f *.html *~ css/*~ content/*~ parts/*~
+
+
 
 .PHONY: html upload install clean
 

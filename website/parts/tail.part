@@ -18,9 +18,9 @@
 				<h3 class="documentation"><span>Documentation:</span></h3>
 				<ul>
 					<li><a href="manpage.html">Man page</a></li>
-					<li><a href="readme.html">README</a></li>
-					<li><a href="todo.html">TODO</a></li>
-					<li><a href="install.html">Installation</a></li>
+					<li><a href="README.html">README</a></li>
+					<li><a href="TODO.html">TODO</a></li>
+					<li><a href="INSTALL.html">Installation</a></li>
 				</ul>
 			</div>
 			<div id="larchives">
