@@ -1,0 +1,38 @@
+NNTPspider - Automated search for public accessable nntp servers
+
+Using informations from the message headers this tools searches for freely
+accessable nntp servers. This search starts with at least one default newsserver 
+you have access to, usually the one at your ISP. It reads the Path: lines in
+the headers in order to find more newsservers. All the found servers are
+checked for public access and queried for a list of supplied newsgroups
+resulting in a quite complete list of all newsservers currently availiable.
+
+NNTPspider queries the standard port 119 only, so "hidden" servers using
+non-standard portnumbers can't be detected.
+
+Writing this tool was inspired by the windows based NewsWolf
+(http://www.netwu.com/newswolf)
+
+
+
+Format of the server list (infile, outfile):
+--------------------------------------------
+
+One line per server.
+Empty lines allowed.
+Leading spaces and tabs are ignored.
+Lines starting with # are treated as comments and ignored.
+Several fields per line, seperated by ':'
+
+a) outfile:
+   name:[port]:[user]:[pass]:[status]:[server response]
+
+b) infile:
+   name[:[port][:[user][:[pass][:[status][:[server response]]]]]]
+
+   If more than one one line exists for one particular server, only the first
+   is used.
+   Only the first five fields (name, port, user, pass and status) are read.
+   Only the first field, the server name, is mandatory. If a field is missing
+   or is empty, default values are used.
+

@@ -1,0 +1,532 @@
+#!/usr/bin/perl -w
+
+# Copyright (c) 2004 Michael Mayer <mmayer@users.berlios.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+
+
+
+# Serverstatus:
+#	o	Open server, public.
+#	p	password needed, access granted.
+#	c	closed server. Unknown password needed.
+#	-	unreachable.
+
+use Getopt::Std;
+use Net::NNTP;
+
+$version	= "0.1";	#FIXME: Makefile should insert this value!
+
+@newsgroups = (			# list of newsgroups to check
+	"de.rec.reisen.misc",
+	"comp.os.linux.announce"
+);
+
+$verbose	= 0;
+$nntptimeout	= 4;		# Timeout for NNTP connections
+$hardmax	= 0;
+$defaultmax	= 1000;		# check no more then # articles per group
+$infile		= "<&STDIN";
+$outfile	= ">&STDOUT";
+
+
+$recheck_active	= 7*24*3600;	# Check active servers every 7 days
+$recheck_dead	= 1*24*3600;	# Check inactive servers every day
+
+				# Statistics: Number of hosts found
+$host_open	= 0;		# open (no password needed)
+$host_failed	= 0;		# unavailiable (no connection)
+$host_private	= 0;		# private (known password needed)
+$host_closed	= 0;		# closed (unknown password needed)
+
+$host_checked	= 0;		# # of checked hosts
+$host_ignored	= 0;		# # of ignored hosts (e.g. known to be closed)
+
+
+#
+# print only in verbose mode
+#
+sub vprint
+{
+	my $text=shift;
+
+	if ($verbose) { print $text };
+}
+
+
+#
+# print only in debug mode
+#
+sub dprint
+{
+	my $text=shift;
+
+	if ($debug) { print $text };
+}
+
+
+
+#
+# return the numerical minimum of two values
+#
+sub min
+{
+	($_[0]<$_[1]) ? $_[0] : $_[1];
+}
+
+
+
+#
+# Check, if the argument is a legal server oder groupname
+# Only letters, digits, underscore and dots are allowed.
+#
+sub is_legal_name
+{
+	my $name=shift;
+
+	if (!defined($name)) { return 0 };
+	return (!($name =~ m/[^-a-zA-Z0-9_\.]/));
+}
+
+
+
+#
+# print version information
+#
+sub show_version
+{
+	print <<"EOF";
+NNTPspider v$version
+EOF
+}
+
+
+sub usage
+{
+	&show_version;
+	print <<"EOF";
+usage: nntpspider [-hDvV] [-a n] [-A n] [-t sec] [-g groupfile]
+		  [-i serverlist] [-o outfile]
+
+>>> NOTE: long options not yet implemented.
+>>>       options marked with # are accepted, but not yet implemented.
+
+-a, --articles	number of articles to check per group, can be overridden in
+		groupfile on a per-group basis
+		(0=all availiable, default=$maxarticles)
+-A, --hardmax	hard maximum number of articles to check per group
+		(default=0, no hard maximum)
+-o, --outfile	save list of found servers to this file (default: stdout)
+-i, --infile	read list of known servers from this file (default: stdin)
+-g, --groups	use groups in groupfile for spidering (default:
+		@newsgroups)
+-t, --timeout	timeout for connection to a server (default: $nntptimeout seconds)
+-v, --verbose	be verbose
+-D, --debug	debug mode: be _very_ verbose. Only for development.
+-V, --version	Display version information.
+-h, --help	show this usage message.
+EOF
+}
+
+
+sub parse_options
+{
+	if (!getopts ("a:A:i:o:g:t:vDVh")) {
+		&usage;
+		exit(1);
+	};
+	if (defined($opt_h)) { &usage; exit(0) };
+	if (defined($opt_V)) { &show_version; exit(0) };
+	if (defined($opt_t)) { $nntptimeout	= $opt_t }; #FIXME: check value
+	if (defined($opt_v)) { $verbose		= $opt_v };
+	if (defined($opt_D)) { $debug = $opt_D; $verbose = 1; };
+	if (defined($opt_g)) { &read_grouplist($opt_g); };
+	if (defined($opt_i)) { $infile		= $opt_i };
+	if (defined($opt_o)) { $outfile		= $opt_o };
+	if (defined($opt_A)) { $hardmax		= $opt_A }; #FIXME: check value
+	if (defined($opt_a)) { $defaultmax	= $opt_a }; #FIXME: check value
+
+	if ($debug) {
+		print "verbose=$verbose\n";
+		print "timeout=$nntptimeout\n";
+		print "check groups @newsgroups\n";
+		print "infile=$infile\n";
+		print "outfile=$outfile\n";
+		print "hardmax=$hardmax\n";
+		print "defaultmax=$defaultmax\n";
+	};
+}
+
+
+
+#
+# Check the maximum number of articles per group
+#
+sub check_maxarticles
+{
+	local ($i);
+
+	$i = @newsgroups;	# yes, @newsgroups, not @maxarticles
+	while ($i--) {
+		if ((!defined($maxarticles[$i]))||($maxarticles[$i]==0)) {
+			 $maxarticles[$i] = $defaultmax;
+		};
+		if ($hardmax>0) {
+			$maxarticles[$i] = min($maxarticles[$i], $hardmax);
+		};
+		dprint "Group $newsgroups[$i]: download max. $maxarticles[$i] articles per server.\n";
+	};
+}
+
+
+
+#
+# read the supplied grouplist file into the array @newsgroups.
+#
+sub read_grouplist
+{
+	my	$filename=shift;
+	local	($group, $maxart);
+
+	open (GRP, $filename)
+		|| die ("Could not open file $filename for reading.\n");
+	@newsgroups = ();
+	@maxarticles = ();
+	while (<GRP>) {
+		chop;
+		($group, $maxart) = split (/:/);
+		&is_legal_name($group) || 
+			die ("Illegal groupname $group in file $filename\n");
+		push (@newsgroups, $group);
+		push (@maxarticles, $maxart);
+	};
+	close(GRP);
+}
+
+
+
+#
+# analyse a single Path: line for new (unknown) NNTP-servers.
+#
+sub find_new_servers
+{
+	local($line) = @_;
+	local($server);
+
+	$line =~ s/.* //;		# remove leading "Path: " from $line
+#	dprint $line;
+	chop $line;
+	foreach $server (split(/!/,$line)) {
+		next if (!($server=~/\./));
+		next if (!is_legal_name($server));
+		$server = lc($server);		# convert to lowercase
+		if ($knownserver{$server}) {
+			dprint "      Found known server $server\n";
+		} else {
+			vprint "      Found new server $server, adding to list.\n";
+			$knownserver{$server} = $server;
+			push (@todo, $server);
+		};
+	};
+};
+
+
+sub checkout_groups
+{
+	local ($line);
+	my	$grp;
+	my	$cnt;
+	my	$i;
+	my	$g;
+	my	$last;
+	my	$first;
+
+	$g = @newsgroups;
+#	foreach $grp (@newsgroups) {
+	while (--$g) {
+		$grp = $newsgroups[$g];
+		vprint "    Checking Newsgroup $grp: ";
+
+		if (!exists (${$grouplists{$server}}{$grp})) {
+			vprint "group not found on this server.\n";
+			next;
+		};
+
+		($cnt, $first, $last) = ($c->group($grp));
+#FIXME check for "480 Username/password required" and correct status
+# to 'c'
+		if (!$c->ok) {
+#			vprint "can't access this group on this server.\n";
+			vprint $c->message;
+			next;
+		};
+		vprint $cnt . " articles found";
+		$i=$maxarticles[$g];
+		dprint ", download max. $i articles";
+		vprint ".\n";
+		while (($i--)&&($first <= $last)&&$cnt--) {
+			dprint "      fetching article $first\n";
+			$header = $c->head($first);
+			$first++;
+			next if (!$c->ok);
+			foreach $line (@$header) {
+				if ($line=~/^Path:/) {
+					&find_new_servers($line);
+				};
+			};
+		};
+	};
+}
+
+
+
+#
+# Connect to one server and get information
+#
+#FIXME: cleanup overall structure.
+#
+sub checkout_server {
+	my $name = shift;
+	my $port = shift || $ENV{NNTPPORT} || getservbyname("nntp","tcp") || 119;
+	my $user = shift || "";
+	my $pass = shift || "";
+	my $status = shift || "";
+	my $firstseen = shift || 0;
+	my $lastseen = shift || 0;
+
+	my $postok	= 0;
+	my $groupcnt	= 0;
+	my $artcnt	= 0;
+	my $speed	= 0;
+	my $servermessage = "";
+	my $list;
+
+	print "  Checking $name: ";
+
+	# ignore servers which are known to be closed or unreachable
+	#FIXME: honor the elapsed time since $lastseen and consider 
+	#FIXME: revisiting it again.
+	if (($status eq "c")||($status eq "-")) {
+		$host_ignored++;	# count ignored hosts
+		vprint "known to be " .
+			( ($status eq "c") ? "closed" : "unreachable" ) .
+			". Ignoring.\n";
+		return join(":",($name,$port,$user,$pass,
+			$status,
+			$firstseen,$lastseen,
+			$groupcnt,$artcnt,
+			$speed,
+			$servermessage
+		));
+	};
+#	if (defined($lastseen)) {
+#		$old = time-$lastseen;
+#		if ((($status eq "-")&&($old<$recheck_dead)) ||
+#		   (($status eq "c")&&($old<$recheck_closed))) {
+#			printf ("Checked %02i:%02i hours ago, skipping.\n",
+#			$old / 3600, ($old % 3600) / 60);
+#			return;
+#		};
+#	};
+
+	$host_checked++;		# count checked hosts
+	$name =~ s/ *//g;
+	$status		= "-";
+	{
+		$c=Net::NNTP->new($name,"Timeout"=>$nntptimeout);
+		if (!defined($c)) {
+			print "Can't connect, giving up.\n";
+			$host_failed++;
+			last;
+		};
+
+		$servermessage	= $c->code . " " . $c->message;
+		$servermessage	=~ tr/:/;/;	# replace ':' by ';'
+		if (!$c->ok) {
+			print "Connection error, giving up.\n";
+			$host_failed++;
+			last;
+		};
+
+		$postok		= $c->postok;
+		if ($list = $c->list()) {;	# try without authentification
+			$status = "o";		# open host
+			print "Bingo! This host is open.\n";
+			$host_open++;
+		} else {
+			if (!defined($user)) {
+				print "Using default account guest/guest: ";
+				$user = $pass = "guest";
+			};
+			if (($c->authinfo($user,$pass))&&($list=$c->list())) {;
+				print "Bingo!\n    Found public host with user $user and password $pass.\n";
+				$status = "p";	# password needed
+				$host_private++;
+			} else {
+				print "Access denied.\n";
+				$status = "c";	# authentification failed
+				$host_closed++;
+			};
+		};
+
+		$groupcnt	= keys(%$list);
+		if ($c->ok) {
+			open (OUT, ">$name.grouplist");
+			foreach $grp (keys(%$list)) {
+				print OUT join(" ",$grp,
+					$$list{$grp}[0],
+					$$list{$grp}[1],
+					$$list{$grp}[2]) . "\n";
+				$artcnt += ($$list{$grp}[0]-$$list{$grp}[1]);
+			};
+			close OUT;
+			$grouplists{$server} = $list;
+			&checkout_groups;
+		}
+		$speed		= 1000;
+
+		$c->DESTROY;		# close connection and free variable
+	};
+
+#	dprint "Posting ok-Flag: " . $postok . "\n";
+	$lastseen	= time;
+	if (!$firstseen) {$firstseen=$lastseen;};
+	vprint "    $groupcnt groups, $artcnt articles.\n";
+	join(":",($name,$port,$user,$pass,
+		$status,
+		$firstseen,$lastseen,
+		$groupcnt,$artcnt,
+		$speed,
+		$servermessage
+	));
+}
+
+
+
+#
+# Query all servers listed in @todo
+#
+# Work starts "from the left" (with $todo[0]), the entry is permanently
+# removed from the list.
+#
+sub todo_abarbeiten {
+	local($server, $count, $result);
+	local($name);
+
+	open (RES, ">$outfile") || die ("can not open $resultfile for writing.\n");
+
+#	$count=0;
+	while ($server=shift(@todo)) {
+		dprint "Number of remaining entries in the todo-list: " . @todo . "\n";
+		$result = &checkout_server(split /:/, $server);
+		dprint "  Result: $result\n";
+		print RES $result . "\n" ;
+#		$count++;
+	};
+#	print "$count servers checked.\n";
+	print "$host_checked servers checked, $host_ignored ignored.\n";
+
+	close (RES);
+}
+
+
+
+#
+# read $infile with known servers and add all valid entries to the todo-list.
+#
+# if more than one one line exists for one particular server, only the first
+# is read.
+#
+sub read_serverlist
+{
+	local($name,$port,$user,$pass,$status);
+	local($good)	= 0;
+	local($skipped)	= 0;
+
+	print "Reading serverlist: ";
+	open (IN, $infile) || die ("Could not open infile $infile for reading.\n");
+	while (<IN>) {
+		chop;
+		#FIXME: propagate ignored lines unmodified to the outfile
+		s/^[ \t]*//;		# remove leading space
+		next if (/^#/);		# ignore comment lines
+		next if (/^$/);		# ignore empty lines
+
+		($name,$port,$user,$pass,$status) = split /:/;
+
+		vprint "\n  Host $name: ";
+		$name = lc($name);	# convert to lowercase
+		if (!is_legal_name($name)) {
+			vprint "illegal server name, ignoring.";
+			$skipped++;
+			next;
+		};
+		if (exists $knownserver{$name} ) {
+			vprint "already seen, skipping.";
+			$skipped++;
+#FIXME: merge information from firstseen/lastseen field into current DB
+			next;
+		};
+
+		$knownserver{$name} = $_;
+#		if (defined($status)) {
+#			if ($status eq "c") {
+#				vprint "known to be a closed one, skipping.";
+#				$skipped++;
+#				next;
+#			} if ($status eq "-") {
+#				vprint "known to be offline, skipping.";
+#				$skipped++;
+#				next;
+#			};
+#		};
+		if (defined($status) && (($status eq "c")||($status eq "-"))) {
+			$bad++;
+		} else {
+			$good++;
+		};
+		vprint "adding to list.";
+		push(@todo, $_);
+#		$good++;
+	};
+
+	vprint "\nServerlist read. ";
+	print "$good accessable";
+	vprint " and $bad closed";
+	print " hosts found";
+	vprint ", $skipped skipped";
+	print ".\n";
+
+#	($good, $skipped);
+	($good, $bad);
+}
+
+
+
+#
+# Statistics: Number of hosts found
+#
+sub print_statistics
+{
+	print "unavailiable (no connection)    : $host_failed\n";
+	print "open (no password needed)       : $host_open\n";
+	print "private (known password needed) : $host_private\n";
+	print "closed (unknown password needed): $host_closed\n";
+}
+
+
+
+#
+# main
+#
+{
+	&parse_options;
+	&check_maxarticles;	# check the maximum number of articles per group
+	&read_serverlist;	# read DB with known servers
+#	dprint "Read " . @todo . " servers from serverlist.\n";
+	&todo_abarbeiten;
+	&print_statistics;
+}

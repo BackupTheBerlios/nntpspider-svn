@@ -1,0 +1,12 @@
+Install:
+	make install
+
+
+Hey, come on... it's a small perl script. Simply copy it to a warm and
+comfortable place like /usr/local/bin and be shure to give it executable
+rights.
+
+Prerequisitories:
+  - Perl (tested with Perl 5.8.3 but should work with every version >= 5.0)
+  - Net::NNTP module (avaliable at http://www.cpan.org)
+
