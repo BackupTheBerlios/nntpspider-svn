@@ -1,0 +1,322 @@
+<div id="manpage">
+
+<H1>NNTPspider</H1>
+Section: Network utilities (1)<BR>Updated: 2004-03-13<BR><A HREF="#index">Index</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+<B>NNTPspider - Automated search for public accessable nntp servers</B>
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>nntpspider</B>
+
+[<B>-hDvV</B>]
+
+[<B>-a</B>
+
+n
+
+]
+
+[<B>-A</B>
+
+n
+
+]
+
+[<B>-t</B>
+
+sec
+
+]
+
+[<B>-g</B>
+
+groupfile
+
+]
+
+[<B>-i</B>
+
+serverlist
+
+]
+
+[<B>-o</B>
+
+outfile
+
+]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<B>nntpspider</B>
+
+searches for public accessable NNTP servers. It reads a list of known servers
+from
+<I>serverlist</I>
+
+or, if no list specified, from standard input. All listed
+servers are checked for public access and queried for a list of supplied
+newsgroups. A number of articles from the groups listed in
+<I>groupfile</I>
+
+are fetched and analysed to gain information about additional nntp servers which
+in turn are queried. The
+resulting list of currently availiable newsservers is saved to
+<I>outfile</I>
+
+(or stdout if no file is specified). For every public host the list of 
+supplied newsgroups is saved to a file
+<I>&lt;hostname&gt;.grouplist</I>
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<B>IMPORTANT NOTE:</B>
+
+long options are not yet implemented! Use the short variants only.
+<DL COMPACT>
+<DT><B>-a, --articles</B>
+
+<DD>
+number of articles to check per group, can be overridden in
+<I>groupfile </I>
+
+on a per-group basis, 0=all availiable (beware! For some servers 
+this can be a very large number &gt; 20000)
+<DT><B>-A, --hardmax</B>
+
+<DD>
+hard maximum number of articles to check per group (default=0, no hard
+maximum). This number can't be overridden in
+<I>groupfile.</I>
+
+<DT><B>-o, --outfile</B>
+
+<DD>
+save list of found servers to this file (default: stdout).
+<DT><B>-i, --infile</B>
+
+<DD>
+read list of known servers from this file (default: stdin).
+<DT><B>-g, --groups</B>
+
+<DD>
+use groups in this file for spidering.
+<DT><B>-t, --timeout</B>
+
+<DD>
+timeout for connection to a server.
+<DT><B>-v, --verbose</B>
+
+<DD>
+be verbose.
+<DT><B>-D, --debug</B>
+
+<DD>
+debug mode: be very verbose. But, as this program is in alpha stage, this
+is the recommanded level of verbosity.
+<DT><B>-V, --version</B>
+
+<DD>
+Display version information.
+<DT><B>-h, --help</B>
+
+<DD>
+show this usage message.
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>USAGE</H2>
+
+Format der Eingabe beschreiben.
+<A NAME="lbAG">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<B>nntpspider</B>
+
+-i serverlist -o foundservers -D
+<P>
+
+This will start a search with the servers listed in
+<I>serverlist</I>
+
+and a small default set of some widespread and high-traffic newsgroups. The
+list of found servers is written to
+<I>foundservers.</I>
+
+<P>
+
+<B>nntpspider</B>
+
+-i serverlist -o foundservers -g grouplist -A 100 -D
+<P>
+
+This search will use the set of newsgroups listed in
+<I>grouplist.</I>
+
+A maximum number of 100 articles per group is fetched.
+<A NAME="lbAH">&nbsp;</A>
+<H2>ENVIRONMENT</H2>
+
+If no default server is given, NNTPSERVER is used.
+<A NAME="lbAI">&nbsp;</A>
+<H2>FILES</H2>
+
+<DL COMPACT>
+<DT><I>outfile</I>
+
+<DD>
+comprehensive information about all checked hosts. One line per host, the 
+fields are delimited by ':'. The field are (in this order):
+<DT><B>hostname,</B>
+
+<DD>
+<DT><B>port,</B>
+
+<DD>
+<DT><B>username,</B>
+
+<DD>
+<DT><B>password,</B>
+
+<DD>
+<DT><B>status</B>
+
+<DD>
+('-': unreachable, 'c': closed host, needs a unknown password, 'p': private
+host, need a known password (supplied in the username/password fields), 'o':
+open host, no authentification is needed.
+<DT><B>firstseen</B>
+
+<DD>
+Unix timestamp when this host was checked for the very first time.
+<DT><B>lastseen</B>
+
+<DD>
+Unix timestamp for the last time this host was checked (successful or not).
+<DT><B>groupcnt</B>
+
+<DD>
+Number of supplied groups on this host.
+<DT><B>artcnt</B>
+
+<DD>
+Total number of supplied articles in all availiable groups.
+<DT><B>speed</B>
+
+<DD>
+Not used.
+<DT><B>servermessage</B>
+
+<DD>
+The welcome (or not...) message the server gave us at login.
+<DT><I>&lt;hostname&gt;.grouplist</I>
+
+<DD>
+list of supplied newsgroups for every host with status open ('o') or public
+('p').
+<DT><I>serverlist</I>
+
+<DD>
+same format like
+<I>outfile,</I>
+
+but all fields after the hostname are optional. In the simplest case, it is
+only a list of some hostnames, one name per line. Empty lines are allowed,
+lines starting with '#' are treated as comments and ignored.
+It is a good idea to use the 
+<I>outfile </I>
+
+from the previos invocation of
+<B>nntpspider</B>
+
+in order to avoid unnecessary queries for hosts which are known to be closed
+or unavailable. This speeds up the whole process a lot.
+<DT><I>grouplist</I>
+
+<DD>
+list of groups to use for spidering. One line per group, optionally
+including the maximum number of articles to download from this group,
+delimited from the groupname with a ':', like
+<B>comp.os.linux:50</B>
+
+</DL>
+<A NAME="lbAJ">&nbsp;</A>
+<H2>HOW DOES IT WORK IN DETAIL?</H2>
+
+All servers with public or unknown status are queried for a list of supplied
+newsgroups. If access is granted, the Path: lines from the message headers
+of Usenet postings in a couple of groups are scanned for information about
+the nntp servers used posting these ones. All found servers are queried
+until no more unknown servers are found.
+<P>
+
+The search starts with at least one default
+newsserver you have access to, usually the one at your ISP. The list of
+known server is read from the given files or read from stdin.
+<A NAME="lbAK">&nbsp;</A>
+<H2>BUGS</H2>
+
+Many. It is still an alpha version, expect the worse. See the TODO file for
+a list of missing and planned features.
+<P>
+
+Existing files will be overwritten without a warning.
+<P>
+
+Please report all bugs to the bug tracker on the project web
+site. Just go to <A HREF="http://nntpspider.berlios.de,">http://nntpspider.berlios.de,</A> and click
+&quot;Bug Reports&quot; on the sidebar.
+<A NAME="lbAL">&nbsp;</A>
+<H2>ACKNOWLEDGMENTS</H2>
+
+Writing this tool was inspired by the windows based NewsWolf
+(<A HREF="http://www.netwu.com/newswolf)">http://www.netwu.com/newswolf)</A>
+<A NAME="lbAM">&nbsp;</A>
+<H2>AVAILABILITY</H2>
+
+The latest version of this program can be found at:
+<A HREF="http://nntpspider.berlios.de">http://nntpspider.berlios.de</A>
+<A NAME="lbAN">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<PRE>
+Michael Mayer (<A HREF="mailto:mmayer@users.berlios.de">mmayer@users.berlios.de</A>).
+</PRE>
+
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">USAGE</A><DD>
+<DT><A HREF="#lbAG">EXAMPLES</A><DD>
+<DT><A HREF="#lbAH">ENVIRONMENT</A><DD>
+<DT><A HREF="#lbAI">FILES</A><DD>
+<DT><A HREF="#lbAJ">HOW DOES IT WORK IN DETAIL?</A><DD>
+<DT><A HREF="#lbAK">BUGS</A><DD>
+<DT><A HREF="#lbAL">ACKNOWLEDGMENTS</A><DD>
+<DT><A HREF="#lbAM">AVAILABILITY</A><DD>
+<DT><A HREF="#lbAN">AUTHOR</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 11:08:22 GMT, March 13, 2004
+
+</div>
+
+<div id="footer">
+	<span class="author">© 2004 by M. Mayer</span>
+	<span class="id">$Id$</span>
+</div>
