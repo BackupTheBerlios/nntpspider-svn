@@ -1,4 +1,7 @@
-VERSION=0.1
+# Makefile for nntpspider
+# $Id$
+
+VERSION=0.1.1
 NAME=nntpspider-$(VERSION)
 
 FILES=AUTHORS COPYING INSTALL TODO README Makefile ChangeLog \
