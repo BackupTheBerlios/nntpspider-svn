@@ -1,0 +1,10 @@
+- Inhalt von servermessage auf : überprüfen (durch ; ersetzen)
+- commandline options
+- html-filter für Ergebnissliste
+- die aktuellsten Postings auslesen (die mit den höchsten nummern)
+  (Aber: dann werden es bei allen Servern die gleichen werden.)
+- GUI schreiben.
+- Dateien nicht kommentarlos überschreiben, sondern durchnummerierte Kopien
+anlegen (wie wget)
+- Debian-Paket
+- ordentliches Makefile
