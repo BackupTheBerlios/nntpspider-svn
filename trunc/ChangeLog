@@ -1,5 +1,11 @@
-nntpspider (0.0.2) unstable; urgency=low
+nntpspider (0.1) unstable; urgency=high
 
+  * a very big step forward. Now it's in real alpha state.
+  * using commandline switches
+  * configurable filenames for serverlist, resultlist and grouplist
+  * differentiate three levels of verbosity: normal/verbose/debug mode
+  * improved readability of the debug output
+  * fixed many bugs in the connection error handling
   * Added a simple Makefile
   * using correct mail adress
 
