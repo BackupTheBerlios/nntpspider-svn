@@ -1,0 +1,54 @@
+<!-- Das war schon alles -->
+
+	</span></p>
+	<p class="p2"><span>
+
+	<div id="linkList">
+		<!--extra div for flexibility - this list will probably be the trickiest spot you'll deal with -->
+		<div id="linkList2">
+			<div id="larchives">
+				<h3 class="nntpspider"><span>NNTPspider:</span></h3>
+				<ul>
+					<li><a href="index.html">Overview</a></li>
+					<li><a href="http://developer.berlios.de/projects/nntpspider">Project page</a></li>
+					<li><a href="http://developer.berlios.de/bugs/?group_id=1550">Report Bug</a></li>
+				</ul>
+			</div>
+			<div id="larchives">
+				<h3 class="documentation"><span>Documentation:</span></h3>
+				<ul>
+					<li><a href="readme.html">README</a></li>
+					<li><a href="todo.html">TODO</a></li>
+					<li><a href="install.html">Installation</a></li>
+				</ul>
+			</div>
+			<div id="larchives">
+				<h3 class="download"><span>Download:</span></h3>
+				<ul>
+					<li><a href="http://developer.berlios.de/project/showfiles.php?group_id=1550">lastest release</a></li>
+					<li><a href="http://developer.berlios.de/svn/?group_id=1550">SVN access</a></li>
+				</ul>
+			</div>
+			<div id="larchives">
+				<h3 class="berlios"><span>Powered by:</span></h3>
+				<ul>
+					<li><a href="http://developer.berlios.de">
+						<img src="http://developer.berlios.de/bslogo.php?group_id=1550&type=1" width="124" height="32" border="0" alt="BerliOS Logo"></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+</div>
+
+<!-- These extra divs/spans may be used as catch-alls to add extra imagery. -->
+<!-- Add a background image to each and use width and height to control sizing, place with absolute positioning -->
+<!-- There's a rather nasty colour shift bug with transparent GIFs in Netscape 6/7 and Mozilla v1.0 up to v1.3 (in which it's fixed),
+		so make sure to test your work in these browsers. -->
+<div id="extraDiv1"><span></span></div><div id="extraDiv2"><span></span></div><div id="extraDiv3"><span></span></div>
+<div id="extraDiv4"><span></span></div><div id="extraDiv5"><span></span></div><div id="extraDiv6"><span></span></div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<meta name="author" content="Michael Mayer" />
+	<meta name="keywords" content="free news newsserver usenet nntp" />
+	<meta name="description" content="Find free Usenet server" />
+
+	<title>NNTPspider - find free Usenet server</title>
+
+	<!-- to correct the unsightly Flash of Unstyled Content. http://www.bluerobot.com/web/css/fouc.asp -->
+	<script type="text/javascript"></script>
+	
+	<style type="text/css" media="all">
+		@import "css/nntpspider.css";
+	</style>
+
+</head>
+
+<!--
+
+
+	This xhtml document is marked up to provide the designer with the maximum possible flexibility.
+	There are more classes and extraneous tags than needed, and in a real world situation, it's more
+	likely that it would be much leaner.
+	
+	However, I think we can all agree that even given that, we're still better off than if this had been
+	built with tables.
+
+
+-->
+
+<body onload="window.defaultStatus='NNTPspider - find free Usenet server';" id="nntpspider">
+
+<div id="container">
+	<div id="intro">
+		<div id="pageHeader">
+			<h1><span>NNTPspider</span></h1>
+			<h2><span>Find free Usenet servers</span></h2>
+			<h3><span>Automated search for public accessable nntp servers</span></h3>
+		</div>
+
+		<div id="quickSummary">
+			<p class="p1"><span>
+
+				It will follow it's path, even if it is
+				virtually invisible. Walking from leaf to
+				leaf it will find all the servers out there.
+
+			</span></p>
+			<p class="p2"><span>get all the stuff your ever dreamed of...</span></p>
+		</div>
+	</div>
+
+	<div id="supportingText">
+
+<!-- Hier kommt der Inhalt -->

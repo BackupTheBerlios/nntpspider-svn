@@ -1,0 +1,175 @@
+/* css Zen Garden submission 004 - 'arch4.20' by Dave Shea - http://www.mezzoblue.com/ */
+/* css released under Creative Commons ShareAlike License v1.0 - http://creativecommons.org/licenses/sa/1.0/  */
+/* All associated graphics copyright 2003, Dave Shea */
+/* Added: May 7th, 2003 */
+
+
+/* IMPORTANT */
+/* This design is not a template. You may not reproduce it elsewhere without the designer's written permission. */
+/* The CSS itself may freely be used for anything you wish, but the associated graphics belong to the designer. */
+/* What you may use - .css files. What you may not use - .jpg, .gif, and .png files. */
+
+
+/* basic elements */
+body {
+	font: 1em tahoma, verdana, sans-serif;
+	color: #fff;
+	background: #005D87 url(bg1.gif) top left repeat-x;
+	margin: 0px;
+	}
+p {
+	font: 1em "trebuchet ms", tahoma, verdana, sans-serif;
+	text-align: justify;
+	margin-top: 0px;
+	}
+h3 {
+	font: bold 1.1em "trebuchet ms", tahoma, verdana, sans-serif;
+	margin-bottom: 0px;
+	}
+h4 {
+	font: bold;
+	margin-bottom: 0px;
+}
+acronym {
+	border-bottom: dotted 1px #fff;
+	}
+a:link {
+	font-weight: bold;
+	text-decoration: none;
+	color: #8AF44F;
+	}
+a:visited {
+	font-weight: bold;
+	text-decoration: none;
+	color: #55AB26;
+	}
+a:active, a:hover {
+	color: #8AF44F;
+	text-decoration: underline;
+	}
+
+/* specific divs */
+#preamble {
+	padding: 0px 180px 0px 25px;
+	}
+
+#supportingText {
+	padding: 0px 180px 0px 25px;
+	}
+
+#pageHeader {
+	font: 1em arial, tahoma, verdana, sans-serif;
+	width: 100%;
+	height: 150px;
+	background: #fff url(spinne.jpg) top left no-repeat;
+	margin-top: 47px;
+	margin-bottom:43px;
+	color: #888;
+	}
+
+#pageHeader h1 {
+	font-size: 48px;
+	position: absolute;
+	top: 60px;
+	right: 180px;
+	margin: 0px;
+	}
+
+#pageHeader h2 {
+	font-size: 20px;
+	position: absolute;
+	top: 120px;
+	right: 180px;
+	margin: 0px;
+	}
+
+#pageHeader h3 {
+	color: #fff;
+	text-align: center;
+	position: absolute;
+	top: 197px;
+	height: 25px;
+	width: 100%;
+	background: #003D67;
+	border-bottom-style: solid;
+	border-color: #7799AC;
+	border-width: 3px;
+	margin: 0px;
+}
+
+#quickSummary .p1 {
+	font: 1em "trebuchet ms", tahoma, verdana, sans-serif;
+	line-height: 1.2em;
+	color: #7799AC;
+/*	background-color: #fff;*/
+	padding: 2px;
+	position: absolute;
+	top: 55px;
+	right: 10px;
+	width: 150px;
+	height: 132px;
+	overflow: auto;
+	}
+
+#quickSummary .p2 {
+	font: 0.8em "trebuchet ms", tahoma, verdana, sans-serif;
+	color: #acd;
+	position: absolute;
+	top: 32px;
+	right: 5px;
+	}
+
+#linkList{
+	font: 1em tahoma, verdana, sans-serif;
+	line-height: 18px;
+	color: #7799AC;
+	position: absolute;
+	top: 240px;
+	right: 0px;
+	width: 150px;
+	overflow: auto;
+	}
+
+#linkList2 h3 {
+	color: #eee;
+	background: #007Da7;
+	font: 0.8em/1em arial, tahoma, verdana, sans-serif;
+	font-weight: bold;
+	font-variant: small-caps;
+	width: 100%;
+	height: 1.2em;
+	padding-top: 0.2em;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-width: thin;
+	border-color: #7799AC;
+	}
+
+#linkList li {
+	font-size: 1em;
+	line-height: 1.3em;
+	display: block;
+	padding: 2px 10px 0px 0px;
+	}
+
+#linkList ul {
+	margin: 0px;
+	padding: 0px;
+	}
+
+#linkList li {
+	list-style-type: none;
+	}
+
+
+#footer {
+	text-align: right;
+	border-top: solid 1px #7799AC;
+	padding-top: 3px;
+	font-variant: small-caps;
+	clear: both;
+	}
+
+#footer .author {
+	float: left;
+}
