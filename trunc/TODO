@@ -1,6 +1,10 @@
 My todo-list an a kind of roadmap for this project (Sorry, some parts are
 still in german)
 
+
+Planned features for version 0.2:
+=================================
+
 - implement a quit mode: Only the resultlines are printed to stdout. (v0.2)
 
 - print all debug messages to stderr, all verbose messages to stdout. (v0.2)
@@ -90,10 +94,12 @@ Wishlist for later versions:
 
 
 Done:
+=====
+
 - reorganize verbosity levels. Now normal and even verbose are too quiet,
-  only debug gives you a feeling if it is still working. (v0.2)
+  only debug gives you a feeling if it is still working. (v0.1.1)
 
 - display activity when fetching the articles ("fetching article 12/100", 
-  "fetching articles... /", "fetching articles 56%") (v0.2)
+  "fetching articles... /", "fetching articles 56%") (v0.1.1)
 
-- check servermessage for ':' (replace by ';')
+- check servermessage for ':' (replace by ';') (v0.1)
