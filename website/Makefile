@@ -1,7 +1,7 @@
 # $Id$
 # $Log$
 
-HTML=index.html manpage.html
+HTML=index.html manpage.html freeservers.html
 PRE=README.html TODO.html INSTALL.html ChangeLog.html
 
 CSSFILES=css/nntpspider.css css/bg1.gif css/spinne.jpg

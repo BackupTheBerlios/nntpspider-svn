@@ -21,6 +21,7 @@
 					<li><a href="README.html">README</a></li>
 					<li><a href="TODO.html">TODO</a></li>
 					<li><a href="INSTALL.html">Installation</a></li>
+					<li><a href="ChangeLog.html">ChangeLog</a></li>
 				</ul>
 			</div>
 			<div id="larchives">
@@ -28,6 +29,12 @@
 				<ul>
 					<li><a href="http://developer.berlios.de/project/showfiles.php?group_id=1550">lastest release</a></li>
 					<li><a href="http://developer.berlios.de/svn/?group_id=1550">SVN access</a></li>
+				</ul>
+			</div>
+			<div id="larchives">
+				<h3 class="download"><span>More Informations:</span></h3>
+				<ul>
+					<li><a href="freeservers.html">free servers</a></li>
 				</ul>
 			</div>
 			<div id="larchives">
