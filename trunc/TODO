@@ -10,12 +10,6 @@ still in german)
 - in checkout_groups: check for "480 Username/password required" and correct 
   status to 'c' (v0.2)
 
-- reorganize verbosity levels. Now normal and even verbose are too quiet,
-  only debug gives you a feeling if it is still working. (v0.2)
-
-- display activity when fetching the articles ("fetching article 12/100", 
-  "fetching articles... /", "fetching articles 56%") (v0.2)
-
 - display state of the todo list (not only in debug mode) (v0.2)
 
 - fetch random articles from the configured groups, not only stricly the 
@@ -28,6 +22,10 @@ still in german)
 - propagate even empty lines and comments from the in- to outfile. (0.2)
 
 - preserve the full file structure and line order from in- to outfile (v0.2)
+
+
+Planned features for version 0.3:
+=================================
 
 - choose some random newsgroups from a server instead of looking for a few
   fixed ones. Prefer well populated groups (v0.3)
@@ -53,11 +51,20 @@ still in german)
 
 - read (and save?) a configfile, e.g. ~/.nntpspider (v0.3)
 
+
+Planned features for version 0.4:
+=================================
+
 - read a list of known public NNTP-servers from a given URL (0.4)
 
 - website: allow (automatic?) upload of resultlists and merge all
   contributions to one usenet-server database. Allow download of the
   resulting super-list.  (v0.4)
+
+
+
+Wishlist for later versions:
+============================
 
 - find a way to systematicly check for non-standard nntp ports. Don't do
   a complete portscan! Only some typical non-standard ports. E.g. ask google
@@ -74,7 +81,7 @@ still in german)
 
 - make a debian package
 
-- write a full-blown Makefile
+- write a full-blown Makefile (maybe automake?)
 
 - write a GUI (v2.0)
 
@@ -83,4 +90,10 @@ still in german)
 
 
 Done:
+- reorganize verbosity levels. Now normal and even verbose are too quiet,
+  only debug gives you a feeling if it is still working. (v0.2)
+
+- display activity when fetching the articles ("fetching article 12/100", 
+  "fetching articles... /", "fetching articles 56%") (v0.2)
+
 - check servermessage for ':' (replace by ';')

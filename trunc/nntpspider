@@ -132,9 +132,8 @@ NOTE: long options not yet implemented.
  -g, --groups	use groups in groupfile for spidering (default:
 		@newsgroups)
  -t, --timeout	timeout for connection to a server (default: $nntptimeout seconds)
- -v, --verbose	be verbose
- -D, --debug	debug mode: be very verbose. But, as this program is in alpha
-		stage, this is the recommanded level of verbosity.
+ -v, --verbose	be verbose.
+ -D, --debug	debug mode: be very verbose.
  -V, --version	Display version information.
  -h, --help	show this usage message.
 
@@ -235,14 +234,40 @@ sub find_new_servers
 		next if (!is_legal_name($server));
 		$server = lc($server);		# convert to lowercase
 		if ($knownserver{$server}) {
-			dprint "      Found known server $server\n";
+			dprint "\r      Found known server $server\n";
 		} else {
-			vprint "      Found new server $server, adding to list.\n";
+			vprint "\r      Found new server $server, adding to list.\n";
 			$knownserver{$server} = $server;
 			push (@todo, $server);
 		};
 	};
 };
+
+
+
+#
+# progress bar with "#" and numbers: [#######.......] 50%
+# returns a string, starting with "\r"
+# usage: progress(val, [ maxval [,text [,width]]])
+#    default values: maxval=100, text="progress", width=20
+#
+sub progress
+{
+	my	$val=shift	|| 0;
+	my	$max=shift	|| 100;
+	my	$text=shift	|| "progress";
+	my	$w=shift	|| 20;
+
+	my	$to_print = $val*$w/$max;
+
+	sprintf("\r%s [%s%s] %d%% ",
+		$text,
+		"#"x($to_print),	# print '#'
+		"."x($w-$to_print),	# fill space with '.'
+		100*$val/$max
+	);
+}
+
 
 
 sub checkout_groups
@@ -254,6 +279,7 @@ sub checkout_groups
 	my	$g;
 	my	$last;
 	my	$first;
+	my	$progresstext="    Downloading article headers";
 
 	$g = @newsgroups;
 #	foreach $grp (@newsgroups) {
@@ -275,11 +301,16 @@ sub checkout_groups
 			next;
 		};
 		vprint $cnt . " articles found";
-		$i=$maxarticles[$g];
-		dprint ", download max. $i articles";
+		$max = &min($cnt, $maxarticles[$g]);
+		dprint ", download $max articles";
 		vprint ".\n";
-		while (($i--)&&($first <= $last)&&$cnt--) {
-			dprint "      fetching article $first\n";
+#		$i=$maxarticles[$g];
+#		dprint ", download max. $i articles";
+#		vprint ".\n";
+#		while (($i--)&&($first <= $last)&&$cnt--) {
+		for ($i=0; ($i<$max)&&($first <= $last); $i++) {
+			print &progress($i, $max, $progresstext);
+#			dprint "      fetching article $first\n";
 			$header = $c->head($first);
 			$first++;
 			next if (!$c->ok);
@@ -289,6 +320,7 @@ sub checkout_groups
 				};
 			};
 		};
+		print &progress($i, $max, $progresstext) . "\n";
 	};
 }
 
@@ -329,7 +361,7 @@ sub read_until_dot
 		$back = length($cnt);
 		push(@$arr,$str);
 	}
-	print STDERR "\r";
+	print STDERR "\n";
 	$cmd->debug_print(0,"[sent data for $cnt groups]\n")
 			if ($cmd->debug & 4);
 
@@ -521,6 +553,7 @@ sub read_serverlist
 {
 	local($name,$port,$user,$pass,$status);
 	local($good)	= 0;
+	local($bad)	= 0;
 	local($skipped)	= 0;
 
 	print "Reading serverlist: ";

@@ -1,10 +1,13 @@
 nntpspider (0.1.1) unstable; urgency=low
 
-  * display activity when fetching the grouplist
+  * reorganized verbosity levels. Normal mode is useful, verbose mode is
+    still usable und debug mode now includes the server communication
+  * added progress indicator when fetching the article headers
+  * added progress indicator when fetching the grouplist
   * in debug mode even the nntp communication is monitored
   * some debug messages are printed to stderr
 
- -- Michael Mayer <mmayer@users.berlios.de>  Wed, 17 Mar 2004 11:26:12 +0100
+ -- Michael Mayer <mmayer@users.berlios.de>  Thu, 18 Mar 2004 11:02:30 +0100
 
 
 nntpspider (0.1) unstable; urgency=high
