@@ -1,3 +1,11 @@
+nntpspider (0.0.2) unstable; urgency=low
+
+  * Added a simple Makefile
+  * using correct mail adress
+
+ -- Michael Mayer <mmayer@users.berlios.de>  Wed, 10 Mar 2004 15:10:53 +0100
+
+
 nntpspider (0.0.1) unstable; urgency=low
 
   * Initial release

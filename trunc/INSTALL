@@ -1,3 +1,7 @@
+Install:
+	make install
+
+
 Hey, come on... it's a small perl script. Simply copy it to a warm and
 comfortable place like /usr/local/bin and be shure to give it executable
 rights.
