@@ -16,9 +16,11 @@
 #	-	unreachable.
 
 use Getopt::Std;
+use Net::Cmd;
 use Net::NNTP;
 
-$version	= "0.1";	#FIXME: Makefile should insert this value!
+$version	= "0.1.1";	# $Id $
+				#FIXME: Makefile should insert this value!
 
 @newsgroups = (			# list of newsgroups to check
 	"de.rec.reisen.misc",
@@ -81,7 +83,7 @@ sub min
 
 #
 # Check, if the argument is a legal server oder groupname
-# Only letters, digits, underscore and dots are allowed.
+# Only letters, digits, '_', '.' and '-' are allowed.
 #
 sub is_legal_name
 {
@@ -293,6 +295,63 @@ sub checkout_groups
 
 
 #
+# modified from Net::Cmd->read_until_dot: added a progress indicator
+# Thanks to Graham Barr <gbarr@pobox.com>
+#
+# returns a reference to a array
+sub read_until_dot
+{
+	my $cmd	= shift;
+	my $arr = [];
+	my $cnt	= 0;
+	my $back = 0;
+
+	$cmd->debug_print(0,"[sending the grouplist]\n")
+			if ($cmd->debug & 4);
+	print STDERR "loading grouplist: ";
+	while(1)
+	{
+		my $str = $cmd->getline() or return undef;
+#FIXME: we really shoud clean up the cursor position with code like this:
+#			{
+#			print "\n";
+#			$cmd->debug_print(0,"[sending aborted after $cnt groups]\n");
+#			return undef
+#		};
+
+		$cmd->debug_print(0,$str)
+			if ($cmd->debug & 4);
+
+		last if($str =~ /^\.\r?\n/o);
+
+		$str =~ s/^\.\././o;
+		print STDERR "\b"x($back) . ++$cnt;
+		$back = length($cnt);
+		push(@$arr,$str);
+	}
+	print STDERR "\r";
+	$cmd->debug_print(0,"[sent data for $cnt groups]\n")
+			if ($cmd->debug & 4);
+
+	$arr;
+}
+
+
+#
+# get the complete list of all articles
+#
+sub get_list
+{
+	my $nntp = shift || die ('usage: get_list($nntp)');
+
+	($nntp->command('LIST')->response == CMD_OK)
+	   ? read_until_dot($nntp)
+	   : undef;
+}
+
+
+
+#
 # Connect to one server and get information
 #
 #FIXME: cleanup overall structure.
@@ -345,7 +404,7 @@ sub checkout_server {
 	$name =~ s/ *//g;
 	$status		= "-";
 	{
-		$c=Net::NNTP->new($name,"Timeout"=>$nntptimeout);
+		$c=Net::NNTP->new($name,"Timeout"=>$nntptimeout, "Debug"=>$debug);
 		if (!defined($c)) {
 			print "Can't connect, giving up.\n";
 			$host_failed++;
@@ -361,7 +420,7 @@ sub checkout_server {
 		};
 
 		$postok		= $c->postok;
-		if ($list = $c->list()) {;	# try without authentification
+		if ($list = get_list($c)) {;	# try without authentification
 			$status = "o";		# open host
 			print "Bingo! This host is open.\n";
 			$host_open++;
@@ -370,7 +429,7 @@ sub checkout_server {
 				print "Using default account guest/guest: ";
 				$user = $pass = "guest";
 			};
-			if (($c->authinfo($user,$pass))&&($list=$c->list())) {;
+			if (($c->authinfo($user,$pass))&&($list=get_list($c))) {;
 				print "Bingo!\n    Found public host with user $user and password $pass.\n";
 				$status = "p";	# password needed
 				$host_private++;
@@ -381,18 +440,29 @@ sub checkout_server {
 			};
 		};
 
-		$groupcnt	= keys(%$list);
+#		$groupcnt	= keys(%$list);
+		$groupcnt	= @$list;
 		if ($c->ok) {
 			open (OUT, ">$name.grouplist");
-			foreach $grp (keys(%$list)) {
-				print OUT join(" ",$grp,
-					$$list{$grp}[0],
-					$$list{$grp}[1],
-					$$list{$grp}[2]) . "\n";
-				$artcnt += ($$list{$grp}[0]-$$list{$grp}[1]);
-			};
+			print OUT @$list;
+#			foreach $grp (keys(%$list)) {
+#				print OUT join(" ",$grp,
+#					$$list{$grp}[0],
+#					$$list{$grp}[1],
+#					$$list{$grp}[2]) . "\n";
+#				$artcnt += ($$list{$grp}[0]-$$list{$grp}[1]);
+#			};
 			close OUT;
-			$grouplists{$server} = $list;
+			# break up the lines
+			my $hash = {};
+			my $ln;
+
+			foreach $ln (@$list) {
+				my @a = split(/[\s\n]+/,$ln);
+				$hash->{$a[0]} = [ @a[1,2,3] ];
+				$artcnt += $a[1]-$a[2];
+			}
+			$grouplists{$server} = $hash;
 			&checkout_groups;
 		}
 		$speed		= 1000;
@@ -530,6 +600,9 @@ sub print_statistics
 # main
 #
 {
+	$|=1;					# activate autoflush on stdout
+	select((select(STDERR), $| = 1)[0]);	# activate autoflush on stderr
+
 	&parse_options;
 	&check_maxarticles;	# check the maximum number of articles per group
 	&read_serverlist;	# read DB with known servers

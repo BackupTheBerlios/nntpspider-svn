@@ -1,3 +1,12 @@
+nntpspider (0.1.1) unstable; urgency=low
+
+  * display activity when fetching the grouplist
+  * in debug mode even the nntp communication is monitored
+  * some debug messages are printed to stderr
+
+ -- Michael Mayer <mmayer@users.berlios.de>  Wed, 17 Mar 2004 11:26:12 +0100
+
+
 nntpspider (0.1) unstable; urgency=high
 
   * a very big step forward. Now it's in real alpha state.
