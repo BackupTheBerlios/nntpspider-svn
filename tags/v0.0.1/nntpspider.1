@@ -1,0 +1,85 @@
+.\" Man page for NNTPspider
+.\"
+.\" Copyright (C) 2004 Michael Mayer (MM)
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file COPYING that comes with the
+.\" man-db distribution.
+.\"
+.\" Tue, 09 Mar 2004 16:42:54 +0100  MM (nntpspider@berlios.de)
+.\" 
+.pc
+.TH NNTPspider 1 "2004-03-09" "0.0.1" "Network utilities"
+.SH NAME
+.B NNTPspider \- Automated search for public accessable nntp servers
+.SH SYNOPSIS
+.B nntpspider
+.RB [\| \-CVh \|]
+.RI [\| file
+\&.\|.\|.\|]
+.SH DESCRIPTION
+.B nntpspider
+searches for public accessable NNTP servers. It reads a list of known servers
+from
+.I file
+arguments, or if none are specified, its standard input. All the found
+servers are checked for public access, queried for a list of supplied
+newsgroups and for information about additional nntp servers. The
+resulting list of currently availiable newsservers is saved to a file
+.I serverscan.result
+in the current directory. For every public host the list of supplied
+newsgroups is saved to a file
+.I <hostname>.grouplist
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Print a help message and exit.
+.TP
+.B \-V, \-\-version
+Display version information.
+.SH USAGE
+Format der Eingabe beschreiben.
+.SH EXAMPLES
+Bla, bla.
+.SH ENVIRONMENT
+If no default server is given, NNTPSERVER is used.
+.SH FILES
+.TP 5
+serverscan.result
+comprehensive information about all checked hosts
+.TP 5
+<hostname>.grouplist
+list of supplied newsgroups for every public host.
+.SH "HOW DOES IT WORK IN DETAIL?"
+All servers with public or unknown status are queried for a list of supplied
+newsgroups. If access is granted, the Path: lines from the message headers
+of Usenet postings in a couple of groups are scanned for information about
+the nntp servers used posting these ones. All found servers are queried
+until no more unknown servers are found.
+.PP
+The search starts with at least one default
+newsserver you have access to, usually the one at your ISP. The list of
+known server is read from the given files or read from stdin.
+.SH BUGS
+Many. It is an early alpha version, far from being bullet proof. Expect the
+worse.
+.PP
+Results are saved in file serverscan.result. Much too verbose.
+Sometimes very slow when accessing individual articles (looking dead, but
+still working). Queries the standard port 119 only, so "hidden" servers using
+non-standard portnumbers can't be detected. Filename not configurable.
+Existing files will be overwritten without a warning.
+.PP
+Please report all bugs to the bug tracker on the project web
+site. Just go to http://developer.berlios.de/projects/nntpspider, and click
+"Bug Reports" on the sidebar under "Features."
+.SH ACKNOWLEGMENTS
+Writing this tool was inspired by the windows based NewsWolf
+(http://www.netwu.com/newswolf)
+.SH AVAILABILITY
+The latest version of this program can be found at:
+  http://nntpspider.berlios.de
+.SH AUTHOR
+.nf
+Michael Mayer (nntpspider@berlios.de).
+.fi

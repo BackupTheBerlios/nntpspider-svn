@@ -1,0 +1,254 @@
+#!/usr/bin/perl -w
+
+# Copyright (c) 2004 Michael Mayer <mmayer@users.berlios.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+
+
+
+# Serverstatus:
+#	o	Open server, public.
+#	p	password needed, access granted.
+#	c	closed server. Unknown password needed.
+#	-	unreachable.
+
+use Net::NNTP;
+
+@newsgroups = (
+	"de.rec.reisen.misc",
+	"comp.os.linux.announce"
+);
+$maxarticles = 1000;		# check no more then # articles per group
+$nntptimeout	= 4;		# Timeout for NNTP connections
+$resultfile	= "serversearch.result";	#FIXME
+
+$recheck_active	= 7*24*3600;	# Check active servers every 7 days
+$recheck_dead	= 1*24*3600;	# Check inactive servers every day
+
+
+sub find_new_servers
+{
+	local($line) = @_;
+	local($server);
+
+	$line =~ s/.* //;
+	print $line;
+	chop $line;
+	foreach $server (split(/!/,$line)) {
+		next if (!($server=~/\./));
+		if ($knownserver{$server}) {
+			print "Found known server $server\n";
+		} else {
+			print "Found new server $server, adding to list.\n";
+			$server =~ tr/A-Z/a-z/;	# convert to lowercase
+			$knownserver{$server} = $server;
+			push (@todo, $server);
+		};
+	};
+};
+
+
+sub checkout_groups
+{
+	local ($line);
+	my	$grp;
+	my	$cnt;
+	my	$i;
+	my	$last;
+	my	$first;
+
+	foreach $grp (@newsgroups) {
+		print "Checking Newsgroup $grp: ";
+
+		if (!exists (${$grouplists{$server}}{$grp})) {
+			print "group not found on this server.\n";
+			next;
+		};
+
+		($cnt, $first, $last) = ($c->group($grp));
+		print $cnt . " articles found.\n";
+		$i=$maxarticles;
+		while (($i--)&&($first <= $last)&&$cnt--) {
+			$header = $c->head($first);
+			next if (!$c->ok);
+			foreach $line (@$header) {
+				if ($line=~/^Path:/) {
+					&find_new_servers($line);
+				};
+			};
+			$first++;
+		};
+	};
+}
+
+
+sub checkout_server {
+	my $name = shift;
+	my $port = shift || $ENV{NNTPPORT} || getservbyname("nntp","tcp") || 119;
+	my $user = shift || "";
+	my $pass = shift || "";
+	my $status = shift;
+	my $firstseen = shift;
+	my $lastseen = shift;
+
+	my $postok	= 0;
+	my $groupcnt	= 0;
+	my $artcnt	= 0;
+	my $speed	= 0;
+	my $servermessage = "";
+	my $list;
+
+	print "Check server $server\n";
+#	if (defined($lastseen)) {
+#		$old = time-$lastseen;
+#		if ((($status eq "-")&&($old<$recheck_dead)) ||
+#		   (($status eq "c")&&($old<$recheck_closed))) {
+#			printf ("Checked %02i:%02i hours ago, skipping.\n",
+#			$old / 3600, ($old % 3600) / 60);
+#			return;
+#		};
+#	};
+
+	$name =~ s/ *//g;
+	$status		= "-";
+	{
+		$c=Net::NNTP->new($name,"Timeout"=>$nntptimeout);
+#		last	if (!defined($c));
+		if (!defined($c)) {
+			print "Can't connect to host $name, giving up.\n";
+			last;
+		};
+
+		$servermessage	= $c->code . " " . $c->message;
+#		last	if (!$c->ok);
+		if (!$c->ok) {
+			print "Error connecting to host $name, giving up.\n";
+			last;
+		};
+
+		$postok		= $c->postok;
+		if ($list = $c->list()) {;	# try without authentification
+			$status = "o";			# open
+			print "Bingo! Found open host $name.\n";
+		} else {
+			if (!defined($user)) {
+				print "Using default account guest/guest\n";
+				$user = $pass = "guest";
+			};
+			if (($c->authinfo($user,$pass))&&($list=$c->list())) {;
+				print "Bingo! Found public host $name with user $user and password $pass.\n";
+				$status = "p";	# password needed
+			} else {
+				print "Access denied for host $name.\n";
+				$status = "c";	# authentification failed
+			};
+		};
+
+		$groupcnt	= keys(%$list);
+		if ($c->ok) {
+			open (OUT, ">$name.grouplist");
+			foreach $grp (keys(%$list)) {
+				print OUT join(" ",$grp,
+					$$list{$grp}[0],
+					$$list{$grp}[1],
+					$$list{$grp}[2]) . "\n";
+				$artcnt += ($$list{$grp}[0]-$$list{$grp}[1]);
+			};
+			close OUT;
+			$grouplists{$server} = $list;
+			&checkout_groups;
+		}
+		$speed		= 1000;
+
+		$c->DESTROY;		# close connection and free variable
+	};
+
+	print "Posting ok-Flag: " . $postok . "\n";
+	$lastseen	= time;
+	if (!$firstseen) {$firstseen=$lastseen;};
+	join(":",($name,$port,$user,$pass,
+		$status,
+		$firstseen,$lastseen,
+		$groupcnt,$artcnt,
+		$speed,
+		$servermessage
+	));
+}
+
+
+
+
+sub todo_abarbeiten {
+	local($server, $count, $result);
+	local($name,$port,$user,$pass,$status,$firstseen) = ("",119,"","","",0);
+
+	open (RES, ">$resultfile") || die ("can not open $resultfile for writing.\n");
+
+	$count=0;
+	while ($server=shift(@todo)) {
+		print "Verbleibende Anzahl in todo-list: " . @todo . "\n";
+#		($name,$port,$user,$pass,$status,$firstseen,$lastseen) = split (/:/,$server);
+		($name) = split (/:/,$server);
+		print "Checking $name\n";
+#		$result = &checkout_server($name,$port,$user,$pass,$status,$firstseen);
+		$result = &checkout_server(split /:/, $server);
+		print "Result for $name:\n$result\n";
+		print RES $result;
+		$count++;
+	};
+	print "$count servers checked.\n";
+
+	close (RES);
+}
+
+
+#
+# read DB with known servers
+#
+sub read_serverlist
+{
+	local($name,$port,$user,$pass,$status);
+	local($good)	= 0;
+	local($skipped)	= 0;
+
+	while (<>) {
+		chop;
+		($name,$port,$user,$pass,$status) = split /:/;
+		print "Reading information for server $name: ";
+
+		if (exists $knownserver{$server} ) {
+			print "already seen, skipping.\n";
+			$skipped++;
+			next;
+		};
+
+		$knownserver{$name} = $_;
+		if ($status eq "c") {
+			print "known to be a closed one, skipping.\n";
+			$skipped++;
+		} if ($status eq "-") {
+			print "known to be offline, skipping.\n";
+			$skipped++;
+		} else {
+			print "adding to list.\n";
+			tr/A-Z/a-z/;	# convert to lowercase
+			push(@todo, $_);
+			$good++;
+		};
+	};
+	($good, $skipped);
+}
+
+
+#
+# main
+#
+{
+	&read_serverlist;	# read DB with known servers
+	print "Read " . @todo . " server from serverlist.\n";
+#	print "Anzahl gefundener Server: " . @knownserver. "\n";
+	&todo_abarbeiten;
+}

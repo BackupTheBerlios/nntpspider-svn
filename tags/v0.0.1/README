@@ -1,0 +1,14 @@
+NNTPspider - Automated search for public accessable nntp servers
+
+Using informations from the message headers this tools searches for freely
+accessable nntp servers. This search starts with at least one default newsserver 
+you have access to, usually the one at your ISP. It reads the Path: lines in
+the headers in order to find more newsservers. All the found servers are
+checked for public access and queried for a list of supplied newsgroups
+resulting in a quite complete list of all newsservers currently availiable.
+
+NNTPspider queries the standard port 119 only, so "hidden" servers using
+non-standard portnumbers can't be detected.
+
+Writing this tool was inspired by the windows based NewsWolf
+(http://www.netwu.com/newswolf)
