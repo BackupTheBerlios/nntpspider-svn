@@ -1,19 +1,29 @@
 <div id="dfpreamble">	<!-- ruebergeholt aus div intro -->
+	<h3><span>News</span></h3>
+	<p class="p1"><span>
+
+		New release v0.1 is 
+		<a href="http://developer.berlios.de/project/showfiles.php?group_id=1550">
+		availiable now</a>. It is a major
+		improvement in usability and fixed many bugs from the
+		pre-alpha version 0.0.1. Now it reached full alpha status:
+		It is usable, but major changes in the commandline and the
+		code are very likely.
+
+	</span></p>
 	<h3><span>Overview</span></h3>
 	<p class="p1"><span>
 
-
 		<span class="nntpspider">nntpspider</span> searches for
 		public accessable NNTP servers. It reads a list of known
-		servers from <I>file</I> arguments, or if none are
-		specified, its standard input. All the found servers are
-		checked for public access, queried for a list of supplied
-		newsgroups and for information about additional nntp
-		servers. The resulting list of currently availiable
-		newsservers is saved to a file <I>serverscan.result</I> in
-		the current directory. For every public host the list of
-		supplied newsgroups is saved to a file
-		<I>&lt;hostname&gt;.grouplist</I>
+		servers. All these servers are checked for public access,
+		queried for a list of supplied newsgroups and for
+		information about additional nntp servers. These new servers
+		are recursivly queried. The resulting list of currently
+		availiable newsservers is saved to a file.
+		For every
+		public host the list of supplied newsgroups is saved to a
+		file.
 
 	</span></p>
 	<h3><span>How does it work?</span></h3>
@@ -48,19 +58,9 @@
 	<h3><span>Bugs</span></h3>
 	<p class="p1"><span>
 
-		Many. It is an early alpha version, far from being bullet
-		proof. Expect the worse.
-
-	</span></p>
-	<p class="p1"><span>
-
-		Results are saved in file serverscan.result. Much too
-		verbose. Sometimes very slow when accessing individual
-		articles (looking dead, but still working). Queries the
-		standard port 119 only, so &quot;hidden&quot; servers using
-		non-standard portnumbers can't be detected. Filename not
-		configurable.  Existing files will be overwritten without a
-		warning.
+		Many. It is still an alpha version. See the
+		<a href="manpage.html">Man-page</a> and the
+		<a href="TODO.html">TODO</a>-file for details.
 
 	</span></p>
 	<p class="p1"><span>
@@ -89,8 +89,15 @@
 
 		can be found in the
 		<a href="manpage.html">man page</a>, the
-		<a href="readme.html">README</a> and the
-		<a href="todo.html">TODO</a>.
+		<a href="README.html">README</a> and the
+		<a href="TODO.html">TODO</a>.
+
+	</span></p>
+	<h3><span>Roadmap</span></h3>
+	<p class="p1"><span>
+
+		See the <a href="TODO.html">TODO</a>-file for details on
+		planned features and for which version they are sheduled.
 
 	</span></p>
 	<h3><span>Acknowledgments</span></h3>

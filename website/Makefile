@@ -30,9 +30,9 @@ upload: install
 
 
 install: html
-	install $(HTML) $(PRE) pics/favicon.ico ~/public_html/nntpspider
-	install -d ~/public_html/nntpspider/css
-	install $(CSSFILES) ~/public_html/nntpspider/css
+	install -m 664 $(HTML) $(PRE) pics/favicon.ico ~/public_html/nntpspider
+	install -m 775 -d ~/public_html/nntpspider/css
+	install -m 664 $(CSSFILES) ~/public_html/nntpspider/css
 
 
 
